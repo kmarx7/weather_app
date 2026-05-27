@@ -1,4 +1,4 @@
-import { Shirt } from 'lucide-react';
+import { Shirt, Sparkles } from 'lucide-react';
 
 const TAG_STYLE = {
   필수: { background: '#fef2f2', color: '#ef4444', borderColor: '#fca5a5' },
@@ -155,6 +155,78 @@ function buildOutfits(weather, airQuality, profile) {
   return items;
 }
 
+function buildSkincare(weather, airQuality) {
+  const temp = weather.main?.temp ?? 20;
+  const humidity = weather.main?.humidity ?? 50;
+  const condition = weather.weather?.[0]?.main ?? 'Clear';
+  const aqi = airQuality?.main?.aqi ?? 1;
+  const pm25 = airQuality?.components?.pm2_5 ?? 0;
+  const wind = weather.wind?.speed ?? 0;
+
+  const items = [];
+
+  // 자외선 (맑음 + 따뜻한 날)
+  if (condition === 'Clear') {
+    if (temp >= 20) {
+      items.push({ emoji: '🌞', text: 'SPF50+ PA+++ 선크림 필수 (외출 30분 전)', tag: '필수' });
+      items.push({ emoji: '🔁', text: '2~3시간마다 선크림 덧바름', tag: '추천' });
+    } else {
+      items.push({ emoji: '🌤️', text: 'SPF30 이상 선크림 도포 권장', tag: '추천' });
+    }
+  }
+
+  // 건조함 (낮은 습도 or 추운 날씨)
+  if (humidity < 40 || temp < 10) {
+    items.push({ emoji: '💧', text: '고보습 크림으로 수분 장벽 강화', tag: '필수' });
+    items.push({ emoji: '👄', text: '립밤 자주 바르기 (입술 갈라짐 주의)', tag: '추천' });
+    if (temp < 0) {
+      items.push({ emoji: '🧴', text: '외출 전 핸드크림 · 바디로션 충분히', tag: '추천' });
+    }
+  } else if (humidity >= 40 && humidity < 60) {
+    items.push({ emoji: '💧', text: '가벼운 수분 크림 또는 에센스 도포', tag: '추천' });
+  }
+
+  // 높은 습도 (여름·장마)
+  if (humidity >= 70 && temp >= 22) {
+    items.push({ emoji: '🧖', text: '유분기 적은 수분 젤 타입 보습제 사용', tag: '추천' });
+    items.push({ emoji: '🚿', text: '세안 후 모공 케어 (땀·유분 주의)', tag: '추천' });
+  }
+
+  // 비 오는 날
+  if (condition === 'Rain' || condition === 'Drizzle') {
+    items.push({ emoji: '🌂', text: '빗물·산성비 닿으면 즉시 세안 권장', tag: '주의' });
+    items.push({ emoji: '🧴', text: '방수 선크림 또는 방수 메이크업 베이스', tag: '추천' });
+  }
+
+  // 눈 오는 날
+  if (condition === 'Snow') {
+    items.push({ emoji: '❄️', text: '차가운 바람으로 피부 건조 — 고보습 크림', tag: '필수' });
+    items.push({ emoji: '👁️', text: '설반사 자외선 강함 — 선글라스 착용', tag: '추천' });
+  }
+
+  // 강한 바람
+  if (wind >= 7) {
+    items.push({ emoji: '🌬️', text: '바람으로 수분 증발 — 외출 전 보습 충분히', tag: '추천' });
+  }
+
+  // 미세먼지
+  if (aqi >= 3 || pm25 > 35) {
+    items.push({ emoji: '😷', text: '미세먼지 피부 자극 — 귀가 후 즉시 클렌징', tag: '필수' });
+    items.push({ emoji: '🧼', text: '저자극 클렌저로 이중세안 권장', tag: '추천' });
+    if (pm25 > 75) {
+      items.push({ emoji: '💊', text: '항산화 성분(비타민C) 스킨케어 추천', tag: '추천' });
+    }
+  }
+
+  // 더운 날 (땀)
+  if (temp >= 28) {
+    items.push({ emoji: '💦', text: '수분 보충 위해 물 자주 마시기', tag: '추천' });
+    items.push({ emoji: '🧊', text: '냉수 세안으로 모공 수축·피지 조절', tag: '추천' });
+  }
+
+  return items;
+}
+
 function tempLabel(temp) {
   if (temp < 0) return '매우 추움';
   if (temp < 5) return '아주 추움';
@@ -176,7 +248,8 @@ export default function OutfitRecommendation({ weather, airQuality, profile }) {
   }
 
   const temp = weather.main?.temp ?? 20;
-  const items = buildOutfits(weather, airQuality, profile);
+  const outfitItems = buildOutfits(weather, airQuality, profile);
+  const skincareItems = buildSkincare(weather, airQuality);
   const styles = profile?.styles ?? [];
   const gender = profile?.gender ?? 'unisex';
   const genderLabel = { male: '남성', female: '여성', unisex: '공용' }[gender];
@@ -188,7 +261,6 @@ export default function OutfitRecommendation({ weather, airQuality, profile }) {
         <span className="outfit-temp-label">{Math.round(temp)}°C · {tempLabel(temp)}</span>
       </div>
 
-      {/* 적용된 프로필 태그 */}
       <div className="outfit-profile-tags">
         <span className="outfit-profile-tag">{genderLabel}</span>
         {styles.map(s => (
@@ -196,8 +268,9 @@ export default function OutfitRecommendation({ weather, airQuality, profile }) {
         ))}
       </div>
 
+      {/* 코디 아이템 */}
       <div className="outfit-list">
-        {items.map((item, i) => {
+        {outfitItems.map((item, i) => {
           const s = TAG_STYLE[item.tag] ?? TAG_STYLE['추천'];
           return (
             <div key={i} className="outfit-item">
@@ -208,6 +281,28 @@ export default function OutfitRecommendation({ weather, airQuality, profile }) {
           );
         })}
       </div>
+
+      {/* 피부 관리 */}
+      {skincareItems.length > 0 && (
+        <>
+          <div className="outfit-sub-title">
+            <Sparkles size={13} />
+            <span>피부 관리</span>
+          </div>
+          <div className="outfit-list">
+            {skincareItems.map((item, i) => {
+              const s = TAG_STYLE[item.tag] ?? TAG_STYLE['추천'];
+              return (
+                <div key={i} className="outfit-item skin">
+                  <span className="outfit-emoji">{item.emoji}</span>
+                  <span className="outfit-text">{item.text}</span>
+                  <span className="outfit-tag" style={s}>{item.tag}</span>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
