@@ -22,6 +22,9 @@ const DEFAULT_PROFILE = {
   heatSensitivity: 'medium',
   commuteTime: '08:00',
   preferredCity: '',
+  gender: 'unisex',
+  styles: ['casual'],
+  outfitPriority: 'comfort',
 };
 
 const NAV_ITEMS = [
@@ -206,7 +209,7 @@ export default function App() {
                 <WeeklyForecast forecast={forecast} />
               </div>
               <div className="dg-outfit">
-                <OutfitRecommendation weather={currentWeather} airQuality={airQuality} />
+                <OutfitRecommendation weather={currentWeather} airQuality={airQuality} profile={profile} />
               </div>
               <div className="dg-forecast">
                 <ForecastRecommendations forecast={forecast} rules={rules} />

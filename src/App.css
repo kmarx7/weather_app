@@ -445,6 +445,93 @@ body {
 .time-input, .text-input { padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); background: var(--bg-card); outline: none; min-height: 44px; }
 .time-input:focus, .text-input:focus { border-color: var(--border-focus); }
 
+.profile-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.profile-section-divider::before,
+.profile-section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip-btn {
+  padding: 8px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all .15s;
+}
+.chip-btn:hover { border-color: var(--primary); color: var(--primary); }
+.chip-btn.active { background: var(--primary-bg); border-color: var(--primary); color: var(--primary); }
+
+.field-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.style-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  text-align: left;
+  cursor: pointer;
+  transition: all .15s;
+  min-height: 56px;
+}
+.style-btn:hover { border-color: var(--primary); }
+.style-btn.active { background: var(--primary-bg); border-color: var(--primary); }
+.style-btn-label { font-size: 13px; font-weight: 700; color: var(--text); }
+.style-btn.active .style-btn-label { color: var(--primary); }
+.style-btn-desc { font-size: 11px; color: var(--text-muted); }
+
+.full-width { grid-column: 1 / -1; }
+
+/* outfit profile tags */
+.outfit-profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.outfit-profile-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--primary-bg);
+  color: var(--primary);
+  border: 1px solid #c7d2fe;
+}
+
 @media (min-width: 768px) {
   .profile-grid { display: grid; grid-template-columns: 1fr 1fr; }
 }
