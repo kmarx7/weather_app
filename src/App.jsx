@@ -83,7 +83,7 @@ export default function App() {
     const result = await fetchWeather(trimmed);
 
     if (!result) {
-      setAddError(`"${trimmed}" 도시를 찾을 수 없습니다. 영문 도시명을 확인하세요.`);
+      setAddError(`"${trimmed}" 도시를 찾을 수 없습니다. 도시명을 다시 확인하세요.`);
       setIsAdding(false);
       return;
     }

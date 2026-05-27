@@ -21,7 +21,7 @@ export default function CitySearch({ onAdd, loading, error }) {
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="도시 이름 입력 (예: Seoul, Tokyo)"
+            placeholder="도시 이름 입력 (예: 서울, Tokyo)"
             className="search-input"
             disabled={loading}
           />
