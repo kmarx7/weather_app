@@ -4,10 +4,29 @@ const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const BASE = 'https://api.openweathermap.org/data/2.5';
 const GEO = 'https://api.openweathermap.org/geo/1.0';
 
+async function geoSearch(query, limit = 1) {
+  const res = await fetch(`${GEO}/direct?q=${encodeURIComponent(query)}&limit=${limit}&appid=${API_KEY}`);
+  if (!res.ok) return [];
+  return await res.json();
+}
+
+// 후보 목록 반환 (최대 5개) — KR 우선 시도, 실패 시 글로벌 검색
+export async function searchCities(query) {
+  let data = await geoSearch(`${query},KR`, 5);
+  if (!data.length) data = await geoSearch(query, 5);
+  // "경기 안산" 처럼 공백 포함 시 마지막 토큰으로도 재시도
+  if (!data.length && query.includes(' ')) {
+    const last = query.split(' ').pop();
+    data = await geoSearch(`${last},KR`, 5);
+    if (!data.length) data = await geoSearch(last, 5);
+  }
+  return data;
+}
+
 async function resolveCoords(cityName) {
-  const res = await fetch(`${GEO}/direct?q=${encodeURIComponent(cityName)}&limit=1&appid=${API_KEY}`);
-  if (!res.ok) return null;
-  const data = await res.json();
+  // KR 우선 → 글로벌 순으로 시도
+  let data = await geoSearch(`${cityName},KR`, 1);
+  if (!data.length) data = await geoSearch(cityName, 1);
   if (!data.length) return null;
   return { lat: data[0].lat, lon: data[0].lon };
 }

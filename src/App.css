@@ -211,8 +211,10 @@ body {
   .dg-weather > *, .dg-air > * { flex: 1; }
   .dg-summary  { grid-column: 1; }
   .dg-tasks    { grid-column: 2; }
-  .dg-weekly   { grid-column: 1; }
-  .dg-outfit   { grid-column: 2; }
+  .dg-weekly   { grid-column: 1; align-self: stretch; display: flex; flex-direction: column; }
+  .dg-weekly > * { flex: 1; }
+  .dg-outfit   { grid-column: 2; align-self: stretch; display: flex; flex-direction: column; }
+  .dg-outfit > * { flex: 1; }
   .dg-forecast { grid-column: 1 / -1; }
   .dg-compare  { grid-column: 1 / -1; }
 }
@@ -297,6 +299,58 @@ body {
   color: var(--danger);
   padding: 4px 2px;
 }
+
+.search-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  padding: 4px;
+  line-height: 0;
+}
+.search-clear-btn:hover { color: var(--text); }
+
+.search-candidates {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-focus);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.candidates-hint {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 8px 14px 6px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border-bottom: 1px solid var(--border);
+}
+
+.candidate-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  text-align: left;
+  transition: background .1s;
+}
+.candidate-item:last-child { border-bottom: none; }
+.candidate-item:hover { background: var(--primary-bg); }
+
+.candidate-flag { font-size: 18px; flex-shrink: 0; line-height: 1; }
+.candidate-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.candidate-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.candidate-region { font-size: 11px; color: var(--text-muted); }
+.candidate-add-icon { color: var(--primary); flex-shrink: 0; }
 
 /* ════════════════════════════════════════
    SAVED LOCATIONS
@@ -724,9 +778,11 @@ body {
   border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
-.wf-list { display: flex; flex-direction: column; gap: 5px; }
+.wf-list { display: flex; flex-direction: column; gap: 5px; flex: 1; justify-content: space-between; }
 
 .wf-row {
   display: grid;
@@ -763,6 +819,8 @@ body {
   border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
 .outfit-header {

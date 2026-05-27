@@ -12,7 +12,7 @@ import WeatherComparison from './components/WeatherComparison';
 import WeeklyForecast from './components/WeeklyForecast';
 import OutfitRecommendation from './components/OutfitRecommendation';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { useWeather } from './hooks/useWeather';
+import { useWeather, searchCities } from './hooks/useWeather';
 import { DEFAULT_RULES } from './utils/defaultRules';
 import { Cloud, LayoutDashboard, ListChecks, SlidersHorizontal, MapPin } from 'lucide-react';
 import './App.css';
@@ -43,6 +43,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('홈');
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState(null);
+  const [candidates, setCandidates] = useState(null);
   const [defaultLoaded, setDefaultLoaded] = useState(false);
 
   const { weatherMap, fetchWeather } = useWeather();
@@ -69,35 +70,51 @@ export default function App() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleAddCity = async (cityName) => {
-    const trimmed = cityName.trim();
+  const handleSearch = async (query) => {
     setAddError(null);
+    setCandidates(null);
 
     if (locations.length >= MAX_LOCATIONS) {
       setAddError(`최대 ${MAX_LOCATIONS}개 지역까지 추가할 수 있습니다.`);
       return;
     }
 
-    const exists = locations.find(l => l.cityName.toLowerCase() === trimmed.toLowerCase());
-    if (exists) {
-      setSelectedId(exists.id);
+    setIsAdding(true);
+    const results = await searchCities(query);
+    setIsAdding(false);
+
+    if (!results.length) {
+      setAddError(`"${query}" 검색 결과가 없습니다. 다른 이름으로 시도해 보세요.`);
       return;
     }
+
+    if (results.length === 1) {
+      await handleSelectCandidate(results[0], results[0].local_names?.ko ?? results[0].name);
+    } else {
+      setCandidates(results);
+    }
+  };
+
+  const handleSelectCandidate = async (candidate, label) => {
+    setCandidates(null);
+    const cityName = label ?? candidate.local_names?.ko ?? candidate.name;
+
+    const exists = locations.find(l => l.cityName === cityName);
+    if (exists) { setSelectedId(exists.id); return; }
 
     setIsAdding(true);
-    const result = await fetchWeather(trimmed);
+    const result = await fetchWeather(cityName);
+    setIsAdding(false);
 
     if (!result) {
-      setAddError(`"${trimmed}" 도시를 찾을 수 없습니다. 도시명을 다시 확인하세요.`);
-      setIsAdding(false);
+      setAddError(`"${cityName}" 날씨 데이터를 불러오지 못했습니다.`);
       return;
     }
 
-    const resolvedName = result.current?.name ?? trimmed;
-    const newLoc = { id: Date.now(), cityName: trimmed, label: resolvedName };
+    const resolvedLabel = result.current?.name ?? cityName;
+    const newLoc = { id: Date.now(), cityName, label: resolvedLabel };
     setLocations(prev => [...prev, newLoc]);
     setSelectedId(newLoc.id);
-    setIsAdding(false);
   };
 
   const handleRemoveLocation = (id) => {
@@ -151,7 +168,14 @@ export default function App() {
               <span>지역 관리</span>
             </div>
             <div className="location-bar-body">
-              <CitySearch onAdd={handleAddCity} loading={isAdding} error={addError} />
+              <CitySearch
+                onSearch={handleSearch}
+                onSelect={handleSelectCandidate}
+                candidates={candidates}
+                loading={isAdding}
+                error={addError}
+                onClear={() => { setCandidates(null); setAddError(null); }}
+              />
               <SavedLocations
                 locations={locations}
                 selectedId={selectedId}
