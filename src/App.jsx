@@ -29,7 +29,7 @@ const DEFAULT_PROFILE = {
 
 const NAV_ITEMS = [
   { id: '홈', icon: LayoutDashboard, label: '홈' },
-  { id: '오늘의할일', icon: ListChecks, label: '오늘의 할일' },
+  { id: '오늘의할일', icon: ListChecks, label: '개인 규칙 관리' },
   { id: '설정', icon: SlidersHorizontal, label: '개인 맞춤 설정' },
 ];
 
