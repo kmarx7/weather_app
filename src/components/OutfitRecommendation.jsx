@@ -268,35 +268,35 @@ export default function OutfitRecommendation({ weather, airQuality, profile }) {
         ))}
       </div>
 
-      {/* 코디 아이템 */}
-      <div className="outfit-list">
+      {/* 코디 카드 그리드 */}
+      <div className="oc-grid">
         {outfitItems.map((item, i) => {
           const s = TAG_STYLE[item.tag] ?? TAG_STYLE['추천'];
           return (
-            <div key={i} className="outfit-item">
-              <span className="outfit-emoji">{item.emoji}</span>
-              <span className="outfit-text">{item.text}</span>
-              <span className="outfit-tag" style={s}>{item.tag}</span>
+            <div key={i} className="oc-card" style={{ borderTopColor: s.color }}>
+              <span className="oc-emoji">{item.emoji}</span>
+              <span className="oc-text">{item.text}</span>
+              <span className="oc-tag" style={s}>{item.tag}</span>
             </div>
           );
         })}
       </div>
 
-      {/* 피부 관리 */}
+      {/* 피부 관리 카드 그리드 */}
       {skincareItems.length > 0 && (
         <>
           <div className="outfit-sub-title">
             <Sparkles size={13} />
             <span>피부 관리</span>
           </div>
-          <div className="outfit-list">
+          <div className="oc-grid">
             {skincareItems.map((item, i) => {
               const s = TAG_STYLE[item.tag] ?? TAG_STYLE['추천'];
               return (
-                <div key={i} className="outfit-item skin">
-                  <span className="outfit-emoji">{item.emoji}</span>
-                  <span className="outfit-text">{item.text}</span>
-                  <span className="outfit-tag" style={s}>{item.tag}</span>
+                <div key={i} className="oc-card oc-skin" style={{ borderTopColor: s.color }}>
+                  <span className="oc-emoji">{item.emoji}</span>
+                  <span className="oc-text">{item.text}</span>
+                  <span className="oc-tag" style={s}>{item.tag}</span>
                 </div>
               );
             })}
