@@ -86,7 +86,7 @@ function ValueStep({ type, value, onChange }) {
   if (isWeather) {
     return (
       <div className="rf-step">
-        <p className="rf-step-label">③ 날씨 조건 값</p>
+        <p className="rf-step-label">③ 날씨 조건 값 <span className="rf-hint">— 모두 선택 가능</span></p>
         <div className="rf-weather-grid">
           {WEATHER_VALUES.map(w => (
             <button
@@ -97,6 +97,7 @@ function ValueStep({ type, value, onChange }) {
             >
               <span className="rf-weather-emoji">{w.emoji}</span>
               <span className="rf-weather-label">{w.label}</span>
+              {value === w.value && <span className="rf-selected-dot" />}
             </button>
           ))}
         </div>

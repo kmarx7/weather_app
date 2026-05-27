@@ -552,30 +552,41 @@ body {
 .rf-weather-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 7px;
 }
 
 @media (min-width: 480px) {
   .rf-weather-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
+.rf-hint { font-size: 10px; color: var(--text-light); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
 .rf-weather-btn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 6px;
-  border: 1.5px solid var(--border);
+  gap: 5px;
+  padding: 12px 6px 10px;
+  border: 2px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-card);
   cursor: pointer;
   transition: all .15s;
+  box-shadow: var(--shadow-sm);
 }
-.rf-weather-btn:hover { border-color: var(--primary); background: var(--primary-bg); }
-.rf-weather-btn.active { border-color: var(--primary); background: var(--primary-bg); }
-.rf-weather-emoji { font-size: 22px; line-height: 1; }
-.rf-weather-label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.rf-weather-btn:hover { border-color: var(--primary); background: var(--primary-bg); transform: translateY(-1px); }
+.rf-weather-btn.active { border-color: var(--primary); background: var(--primary-bg); box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
+.rf-weather-emoji { font-size: 26px; line-height: 1; }
+.rf-weather-label { font-size: 12px; font-weight: 700; color: var(--text-muted); }
 .rf-weather-btn.active .rf-weather-label { color: var(--primary); }
+.rf-selected-dot {
+  position: absolute;
+  top: 5px; right: 5px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+}
 
 /* 숫자 프리셋 */
 .rf-preset-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
