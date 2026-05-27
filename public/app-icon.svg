@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#6366f1"/>
+  <!-- Cloud body -->
+  <ellipse cx="230" cy="290" rx="130" ry="85" fill="white"/>
+  <ellipse cx="300" cy="270" rx="100" ry="70" fill="white"/>
+  <ellipse cx="200" cy="260" rx="85" ry="65" fill="white"/>
+  <ellipse cx="260" cy="240" rx="95" ry="75" fill="white"/>
+  <!-- Checkmark -->
+  <polyline points="178,285 225,335 335,215" fill="none" stroke="#6366f1" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -12,7 +12,7 @@ import ActivityLog from './components/ActivityLog';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useWeather } from './hooks/useWeather';
 import { DEFAULT_RULES } from './utils/defaultRules';
-import { Cloud, MapPin } from 'lucide-react';
+import { Cloud, LayoutDashboard, ListChecks, SlidersHorizontal, ScrollText, MapPin } from 'lucide-react';
 import './App.css';
 
 const DEFAULT_PROFILE = {
@@ -21,7 +21,13 @@ const DEFAULT_PROFILE = {
   commuteTime: '08:00',
   preferredCity: '',
 };
-const TABS = ['대시보드', '규칙 관리', '개인 설정', '실행 로그'];
+
+const NAV_ITEMS = [
+  { id: '대시보드', icon: LayoutDashboard, label: '홈' },
+  { id: '규칙 관리', icon: ListChecks, label: '규칙' },
+  { id: '개인 설정', icon: SlidersHorizontal, label: '설정' },
+  { id: '실행 로그', icon: ScrollText, label: '로그' },
+];
 
 function makeLog(message, type = 'info') {
   return {
@@ -64,11 +70,9 @@ export default function App() {
     return newLoc;
   }, [fetchWeather, addLog, setLocations, setSelectedId]);
 
-  // On mount: load saved locations, or default to Seoul
   useEffect(() => {
     if (defaultLoaded) return;
     setDefaultLoaded(true);
-
     if (locations.length === 0) {
       addCity('Seoul', true).then(loc => {
         if (loc) addLog('서울을 기본 지역으로 추가했습니다.', 'success');
@@ -115,13 +119,11 @@ export default function App() {
     setRules(prev => [...prev, rule]);
     addLog(`규칙 추가: ${rule.message}`, 'success');
   };
-
   const handleDeleteRule = (id) => {
     const rule = rules.find(r => r.id === id);
     setRules(prev => prev.filter(r => r.id !== id));
     if (rule) addLog(`규칙 삭제: ${rule.message}`, 'info');
   };
-
   const handleToggleRule = (id) => {
     setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
   };
@@ -135,86 +137,68 @@ export default function App() {
   const error = weatherData?.error ?? null;
   const forecastRules = rules.filter(r => r.scope === 'forecast');
 
+  const cityLabel = selectedLocation?.label ?? selectedLocation?.cityName ?? null;
+
   return (
     <div className="app">
+      {/* Header */}
       <header className="app-header">
         <div className="header-left">
-          <Cloud size={22} className="header-icon" />
+          <Cloud size={20} className="header-icon" />
           <h1 className="app-title">Weather Tasks</h1>
-          <span className="app-subtitle">날씨 기반 할 일 자동화</span>
         </div>
-        <div className="header-right">
-          {selectedLocation && (
-            <span className="selected-badge">
-              📍 {selectedLocation.label ?? selectedLocation.cityName}
-            </span>
-          )}
-        </div>
+        {cityLabel && (
+          <div className="header-city">
+            <MapPin size={13} />
+            <span>{cityLabel}</span>
+          </div>
+        )}
       </header>
 
+      {/* Scrollable content */}
       <main className="main-content">
-        <nav className="tab-nav">
-          {TABS.map(tab => (
-            <button
-              key={tab}
-              className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </nav>
-
         {activeTab === '대시보드' && (
-          <div className="tab-content">
-            <div className="dashboard-grid">
-              {/* Left column */}
-              <div className="col-left">
-                <WeatherCard
-                  weather={currentWeather}
-                  loading={isLoading}
-                  error={error}
-                  cityName={selectedLocation?.label ?? selectedLocation?.cityName ?? '—'}
-                  onRefresh={selectedLocation ? () => handleRefresh(selectedLocation.cityName) : null}
-                />
-                <AirQuality airQuality={airQuality} />
-                <AiSummary
-                  cityName={selectedLocation?.label ?? selectedLocation?.cityName ?? ''}
-                  weather={currentWeather}
-                  forecast={forecast}
-                  tasks={rules}
-                  forecastTasks={forecastRules}
-                  profile={profile}
-                />
-                {/* Location section — below AI summary */}
-                <div className="location-section">
-                  <div className="location-section-header">
-                    <MapPin size={15} />
-                    <span>지역 관리</span>
-                  </div>
-                  <CitySearch onAdd={handleAddCity} loading={isLoading} />
-                  <SavedLocations
-                    locations={locations}
-                    selectedId={selectedId}
-                    onSelect={setSelectedId}
-                    onRemove={handleRemoveLocation}
-                    onRefresh={handleRefresh}
-                    weatherMap={weatherMap}
-                  />
-                </div>
-              </div>
+          <div className="page-content">
+            <WeatherCard
+              weather={currentWeather}
+              loading={isLoading}
+              error={error}
+              cityName={cityLabel ?? '—'}
+              onRefresh={selectedLocation ? () => handleRefresh(selectedLocation.cityName) : null}
+            />
+            <AirQuality airQuality={airQuality} />
+            <AiSummary
+              cityName={cityLabel ?? ''}
+              weather={currentWeather}
+              forecast={forecast}
+              tasks={rules}
+              forecastTasks={forecastRules}
+              profile={profile}
+            />
+            <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
+            <ForecastRecommendations forecast={forecast} rules={rules} />
 
-              {/* Right column */}
-              <div className="col-right">
-                <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
-                <ForecastRecommendations forecast={forecast} rules={rules} />
+            {/* Location section */}
+            <div className="location-section">
+              <div className="location-section-header">
+                <MapPin size={15} />
+                <span>지역 관리</span>
               </div>
+              <CitySearch onAdd={handleAddCity} loading={isLoading} />
+              <SavedLocations
+                locations={locations}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onRemove={handleRemoveLocation}
+                onRefresh={handleRefresh}
+                weatherMap={weatherMap}
+              />
             </div>
           </div>
         )}
 
         {activeTab === '규칙 관리' && (
-          <div className="tab-content">
+          <div className="page-content">
             <RuleManager
               rules={rules}
               onAdd={handleAddRule}
@@ -225,17 +209,31 @@ export default function App() {
         )}
 
         {activeTab === '개인 설정' && (
-          <div className="tab-content">
+          <div className="page-content">
             <ProfileSettings profile={profile} onChange={setProfile} />
           </div>
         )}
 
         {activeTab === '실행 로그' && (
-          <div className="tab-content">
+          <div className="page-content">
             <ActivityLog logs={logs} onClear={() => setLogs([])} />
           </div>
         )}
       </main>
+
+      {/* Bottom Navigation */}
+      <nav className="bottom-nav">
+        {NAV_ITEMS.map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            className={`bottom-nav-item ${activeTab === id ? 'active' : ''}`}
+            onClick={() => setActiveTab(id)}
+          >
+            <Icon size={22} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
