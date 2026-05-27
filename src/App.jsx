@@ -24,9 +24,11 @@ const DEFAULT_PROFILE = {
 
 const NAV_ITEMS = [
   { id: '홈', icon: LayoutDashboard, label: '홈' },
-  { id: '자동화', icon: ListChecks, label: '자동화' },
+  { id: '오늘의할일', icon: ListChecks, label: '오늘의 할일' },
   { id: '설정', icon: SlidersHorizontal, label: '설정' },
 ];
+
+const MAX_LOCATIONS = 5;
 
 export default function App() {
   const [locations, setLocations] = useLocalStorage('wt_locations', []);
@@ -65,6 +67,11 @@ export default function App() {
   const handleAddCity = async (cityName) => {
     const trimmed = cityName.trim();
     setAddError(null);
+
+    if (locations.length >= MAX_LOCATIONS) {
+      setAddError(`최대 ${MAX_LOCATIONS}개 지역까지 추가할 수 있습니다.`);
+      return;
+    }
 
     const exists = locations.find(l => l.cityName.toLowerCase() === trimmed.toLowerCase());
     if (exists) {
@@ -202,8 +209,8 @@ export default function App() {
             </div>
           )}
 
-          {/* ── 자동화 ── */}
-          {activeTab === '자동화' && (
+          {/* ── 오늘의 할일 ── */}
+          {activeTab === '오늘의할일' && (
             <RuleManager
               rules={rules}
               onAdd={handleAddRule}
