@@ -10,7 +10,7 @@ function isKorean(text) {
   return /[가-힣ㄱ-ㆎ]/.test(text);
 }
 
-async function nominatimSearch(query, limit = 5) {
+async function nominatimSearch(query, limit = 5, countryCode = null) {
   const params = new URLSearchParams({
     q: query,
     format: 'json',
@@ -18,7 +18,7 @@ async function nominatimSearch(query, limit = 5) {
     limit: String(limit),
     'accept-language': 'ko',
   });
-  if (isKorean(query)) params.set('countrycodes', 'kr');
+  if (countryCode) params.set('countrycodes', countryCode);
   try {
     const res = await fetch(`${NOMINATIM}/search?${params}`, { headers: NOMINATIM_HEADERS });
     if (!res.ok) return [];
@@ -70,22 +70,31 @@ export async function reverseGeocode(lat, lon) {
   }
 }
 
-// 후보 목록 반환 (Nominatim — 한글 소도시 완전 지원)
+// 후보 목록 반환 (Nominatim — 한국 소도시 + 해외 도시 모두 지원)
 export async function searchCities(query) {
-  // 공백이 있으면 마지막 토큰도 시도 ("경기 안산" → "안산")
-  const queries = [query];
-  if (query.includes(' ')) queries.push(query.split(' ').pop());
-
+  const korean = isKorean(query);
   let raw = [];
-  for (const q of queries) {
-    raw = await nominatimSearch(q, 8);
-    if (raw.length) break;
+
+  // 한글 쿼리는 KR 우선 시도 → 결과 없으면 글로벌(해외 도시 한글 검색 지원)
+  if (korean) {
+    raw = await nominatimSearch(query, 8, 'kr');
+    if (!raw.length) raw = await nominatimSearch(query, 8);
+  } else {
+    raw = await nominatimSearch(query, 8);
+  }
+
+  // "경기 안산" 등 공백 포함 → 마지막 토큰으로 재시도
+  if (!raw.length && query.includes(' ')) {
+    const last = query.split(' ').pop();
+    raw = korean
+      ? await nominatimSearch(last, 8, 'kr')
+      : await nominatimSearch(last, 8);
+    if (!raw.length) raw = await nominatimSearch(last, 8);
   }
 
   const placeClasses = new Set(['place', 'boundary', 'administrative']);
   const filtered = raw.filter(r => placeClasses.has(r.class) || r.type === 'administrative');
 
-  // 이름 기준 중복 제거
   const seen = new Set();
   const result = [];
   for (const r of filtered) {
@@ -98,7 +107,7 @@ export async function searchCities(query) {
   return result.slice(0, 5);
 }
 
-// 좌표 조회 (Nominatim)
+// 좌표 조회 — 국가 제한 없이 전 세계 도시 지원
 async function resolveCoords(cityName) {
   const raw = await nominatimSearch(cityName, 1);
   if (!raw.length) return null;
