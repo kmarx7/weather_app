@@ -639,37 +639,111 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-.weekly-list { display: flex; flex-direction: column; gap: 5px; }
+.wf-list { display: flex; flex-direction: column; gap: 8px; }
 
-.weekly-item {
-  display: grid;
-  grid-template-columns: 68px 28px 1fr 44px 76px;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+.wf-day-card {
   background: var(--bg-card2);
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow .15s;
 }
-
-.weekly-item.today {
+.wf-day-card.today {
   background: var(--primary-bg);
   border-color: #c7d2fe;
 }
 
-.weekly-day { display: flex; flex-direction: column; gap: 1px; }
-.weekly-dayname { font-size: 13px; font-weight: 700; color: var(--text); }
-.weekly-date { font-size: 11px; color: var(--text-muted); }
-.weekly-item.today .weekly-dayname { color: var(--primary); }
+/* top row */
+.wf-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wf-date-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 70px;
+}
+.wf-dayname { font-size: 14px; font-weight: 700; color: var(--text); }
+.wf-date { font-size: 11px; color: var(--text-muted); }
+.wf-day-card.today .wf-dayname { color: var(--primary); }
 
-.weekly-icon { font-size: 20px; text-align: center; }
-.weekly-cond { font-size: 12px; color: var(--text-muted); }
-.weekly-pop { font-size: 12px; color: #3b82f6; font-weight: 600; text-align: center; }
+.wf-cond-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.wf-icon { font-size: 24px; line-height: 1; }
+.wf-cond { font-size: 13px; font-weight: 600; }
 
-.weekly-temps { display: flex; align-items: center; gap: 3px; justify-content: flex-end; }
-.weekly-high { font-size: 15px; font-weight: 700; color: var(--text); }
-.weekly-sep { font-size: 11px; color: var(--text-light); }
-.weekly-low { font-size: 13px; color: var(--text-muted); }
+.wf-temp-block {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.wf-high { font-size: 18px; font-weight: 800; color: var(--text); }
+.wf-slash { font-size: 13px; color: var(--text-light); }
+.wf-low { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+
+/* temp bar */
+.wf-bar-track {
+  position: relative;
+  width: 100%;
+  height: 5px;
+  background: rgba(0,0,0,.08);
+  border-radius: 4px;
+  overflow: visible;
+}
+.wf-bar-fill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #93c5fd, #f97316);
+}
+
+/* stats row */
+.wf-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.wf-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.wf-pop { color: #3b82f6; font-weight: 600; }
+
+/* hourly slots */
+.wf-hourly {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+.wf-hour-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  background: rgba(255,255,255,.6);
+  border-radius: 8px;
+}
+.wf-day-card.today .wf-hour-slot { background: rgba(255,255,255,.5); }
+.wf-hour-label { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+.wf-hour-icon { font-size: 18px; line-height: 1; }
+.wf-hour-temp { font-size: 13px; font-weight: 700; color: var(--text); }
 
 /* ════════════════════════════════════════
    OUTFIT RECOMMENDATION
