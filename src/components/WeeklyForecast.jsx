@@ -45,25 +45,22 @@ export default function WeeklyForecast({ forecast }) {
   return (
     <div className="weekly-forecast-card">
       <h3 className="section-title"><Calendar size={16} /> 5일 날씨 예보</h3>
-      <div className="wf-list">
+      <div className="wf-cards">
         {days.map((day, i) => {
           const isToday = day.date.toDateString() === todayStr;
-          const dayName = isToday ? '오늘' : `${DAY_KR[day.date.getDay()]}`;
+          const dayName = isToday ? '오늘' : `${DAY_KR[day.date.getDay()]}요일`;
           const dateStr = `${day.date.getMonth() + 1}/${day.date.getDate()}`;
+          const icon = CONDITION_ICON[day.condition] ?? '🌡️';
+          const cond = CONDITION_KR[day.condition] ?? day.condition;
           return (
-            <div key={i} className={`wf-row${isToday ? ' today' : ''}`}>
-              <div className="wf-day-col">
-                <span className="wf-dayname">{dayName}</span>
-                <span className="wf-date">{dateStr}</span>
-              </div>
-              <span className="wf-icon">{CONDITION_ICON[day.condition] ?? '🌡️'}</span>
-              <span className="wf-cond">{CONDITION_KR[day.condition] ?? day.condition}</span>
-              <span className="wf-pop">{day.pop > 0 ? `💧${day.pop}%` : ''}</span>
-              <div className="wf-temps">
-                <span className="wf-high">{day.high}°</span>
-                <span className="wf-slash">/</span>
-                <span className="wf-low">{day.low}°</span>
-              </div>
+            <div key={i} className={`wf-card${isToday ? ' today' : ''}`}>
+              <span className="wfc-dayname">{dayName}</span>
+              <span className="wfc-date">{dateStr}</span>
+              <span className="wfc-icon">{icon}</span>
+              <span className="wfc-cond">{cond}</span>
+              <span className="wfc-high">{day.high}°</span>
+              <span className="wfc-low">{day.low}°</span>
+              {day.pop > 0 && <span className="wfc-pop">💧{day.pop}%</span>}
             </div>
           );
         })}

@@ -949,33 +949,80 @@ body {
   flex-direction: column;
 }
 
-.wf-list { display: flex; flex-direction: column; gap: 5px; flex: 1; justify-content: space-between; }
-
-.wf-row {
-  display: grid;
-  grid-template-columns: 52px 26px 1fr 46px 72px;
-  align-items: center;
+/* vertical card layout */
+.wf-cards {
+  display: flex;
+  flex-direction: row;
   gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-card2);
-  border: 1px solid transparent;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
-.wf-row.today { background: var(--primary-bg); border-color: #c7d2fe; }
+.wf-cards::-webkit-scrollbar { height: 4px; }
+.wf-cards::-webkit-scrollbar-track { background: transparent; }
+.wf-cards::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-.wf-day-col { display: flex; flex-direction: column; gap: 1px; }
-.wf-dayname { font-size: 13px; font-weight: 700; color: var(--text); }
-.wf-date { font-size: 11px; color: var(--text-muted); }
-.wf-row.today .wf-dayname { color: var(--primary); }
+.wf-card {
+  flex: 1 0 0;
+  min-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border-radius: var(--radius);
+  background: var(--bg-card2);
+  border: 1.5px solid transparent;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.wf-card.today {
+  background: var(--primary-bg);
+  border-color: #c7d2fe;
+}
 
-.wf-icon { font-size: 20px; text-align: center; line-height: 1; }
-.wf-cond { font-size: 12px; color: var(--text-muted); }
-.wf-pop { font-size: 12px; color: #3b82f6; font-weight: 600; text-align: center; min-width: 40px; }
+.wfc-dayname {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.wf-card.today .wfc-dayname { color: var(--primary); }
 
-.wf-temps { display: flex; align-items: center; gap: 2px; justify-content: flex-end; }
-.wf-high { font-size: 14px; font-weight: 700; color: var(--text); }
-.wf-slash { font-size: 11px; color: var(--text-light); }
-.wf-low { font-size: 12px; color: var(--text-muted); }
+.wfc-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.wfc-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.wfc-cond {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.wfc-high {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.wfc-low {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.wfc-pop {
+  font-size: 11px;
+  color: #3b82f6;
+  font-weight: 600;
+}
 
 /* ════════════════════════════════════════
    OUTFIT RECOMMENDATION
