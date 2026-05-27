@@ -127,7 +127,7 @@ export default function App() {
       <header className="app-header">
         <div className="header-left">
           <Cloud size={20} className="header-icon" />
-          <h1 className="app-title">Weather Tasks</h1>
+          <h1 className="app-title">날씨를 읽어 드립니다</h1>
         </div>
         {cityLabel && (
           <div className="header-city">
