@@ -2,33 +2,89 @@ import { useState, useCallback } from 'react';
 
 const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const BASE = 'https://api.openweathermap.org/data/2.5';
-const GEO = 'https://api.openweathermap.org/geo/1.0';
+const NOMINATIM = 'https://nominatim.openstreetmap.org';
 
-async function geoSearch(query, limit = 1) {
-  const res = await fetch(`${GEO}/direct?q=${encodeURIComponent(query)}&limit=${limit}&appid=${API_KEY}`);
-  if (!res.ok) return [];
-  return await res.json();
+const NOMINATIM_HEADERS = { 'User-Agent': 'WeatherTasks/1.0 (personal weather app)' };
+
+function isKorean(text) {
+  return /[가-힣ㄱ-ㆎ]/.test(text);
 }
 
-// 후보 목록 반환 (최대 5개) — KR 우선 시도, 실패 시 글로벌 검색
-export async function searchCities(query) {
-  let data = await geoSearch(`${query},KR`, 5);
-  if (!data.length) data = await geoSearch(query, 5);
-  // "경기 안산" 처럼 공백 포함 시 마지막 토큰으로도 재시도
-  if (!data.length && query.includes(' ')) {
-    const last = query.split(' ').pop();
-    data = await geoSearch(`${last},KR`, 5);
-    if (!data.length) data = await geoSearch(last, 5);
+async function nominatimSearch(query, limit = 5) {
+  const params = new URLSearchParams({
+    q: query,
+    format: 'json',
+    addressdetails: '1',
+    limit: String(limit),
+    'accept-language': 'ko',
+  });
+  if (isKorean(query)) params.set('countrycodes', 'kr');
+  try {
+    const res = await fetch(`${NOMINATIM}/search?${params}`, { headers: NOMINATIM_HEADERS });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
   }
-  return data;
 }
 
+function pickName(addr, fallback) {
+  return (
+    addr.city ?? addr.town ?? addr.village ?? addr.county ??
+    addr.municipality ?? addr.suburb ?? fallback ?? ''
+  );
+}
+
+function toCandidate(r) {
+  const addr = r.address ?? {};
+  const name = pickName(addr, r.display_name?.split(',')[0]);
+  const state = addr.state ?? addr.province ?? addr.region ?? '';
+  const country = (addr.country_code ?? '').toUpperCase();
+  const flag = { KR: '🇰🇷', JP: '🇯🇵', US: '🇺🇸', CN: '🇨🇳', GB: '🇬🇧', FR: '🇫🇷', DE: '🇩🇪' }[country] ?? '🌍';
+  const region = [state, country !== 'KR' ? country : null].filter(Boolean).join(' · ');
+  return {
+    name,
+    region,
+    flag,
+    country,
+    lat: parseFloat(r.lat),
+    lon: parseFloat(r.lon),
+  };
+}
+
+// 후보 목록 반환 (Nominatim — 한글 소도시 완전 지원)
+export async function searchCities(query) {
+  // 공백이 있으면 마지막 토큰도 시도 ("경기 안산" → "안산")
+  const queries = [query];
+  if (query.includes(' ')) queries.push(query.split(' ').pop());
+
+  let raw = [];
+  for (const q of queries) {
+    raw = await nominatimSearch(q, 8);
+    if (raw.length) break;
+  }
+
+  const placeClasses = new Set(['place', 'boundary', 'administrative']);
+  const filtered = raw.filter(r => placeClasses.has(r.class) || r.type === 'administrative');
+
+  // 이름 기준 중복 제거
+  const seen = new Set();
+  const result = [];
+  for (const r of filtered) {
+    const c = toCandidate(r);
+    if (c.name && !seen.has(c.name)) {
+      seen.add(c.name);
+      result.push(c);
+    }
+  }
+  return result.slice(0, 5);
+}
+
+// 좌표 조회 (Nominatim)
 async function resolveCoords(cityName) {
-  // KR 우선 → 글로벌 순으로 시도
-  let data = await geoSearch(`${cityName},KR`, 1);
-  if (!data.length) data = await geoSearch(cityName, 1);
-  if (!data.length) return null;
-  return { lat: data[0].lat, lon: data[0].lon };
+  const raw = await nominatimSearch(cityName, 1);
+  if (!raw.length) return null;
+  return { lat: parseFloat(raw[0].lat), lon: parseFloat(raw[0].lon) };
 }
 
 export function useWeather() {

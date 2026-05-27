@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, AlertCircle, MapPin, X } from 'lucide-react';
-
-const COUNTRY_FLAG = { KR: '🇰🇷', JP: '🇯🇵', US: '🇺🇸', CN: '🇨🇳', GB: '🇬🇧', FR: '🇫🇷', DE: '🇩🇪' };
-
-function candidateLabel(c) {
-  const name = c.local_names?.ko ?? c.local_names?.en ?? c.name;
-  const parts = [c.state, c.country !== 'KR' ? c.country : null].filter(Boolean);
-  return { name, region: parts.join(' · '), flag: COUNTRY_FLAG[c.country] ?? '🌍' };
-}
+import { Search, Plus, AlertCircle, X } from 'lucide-react';
 
 export default function CitySearch({ onSearch, onSelect, candidates, loading, error, onClear }) {
   const [input, setInput] = useState('');
@@ -20,9 +12,13 @@ export default function CitySearch({ onSearch, onSelect, candidates, loading, er
   };
 
   const handleSelect = (c) => {
-    const { name } = candidateLabel(c);
     setInput('');
-    onSelect(c, name);
+    onSelect(c, c.name);
+  };
+
+  const handleClear = () => {
+    setInput('');
+    onClear();
   };
 
   return (
@@ -34,12 +30,12 @@ export default function CitySearch({ onSearch, onSelect, candidates, loading, er
             type="text"
             value={input}
             onChange={e => { setInput(e.target.value); if (candidates?.length) onClear(); }}
-            placeholder="도시 검색 (예: 안산, 경기 안산, Tokyo)"
+            placeholder="도시 검색 (예: 안산, 경기 안산, 부천, Tokyo)"
             className="search-input"
             disabled={loading}
           />
           {(input || candidates?.length > 0) && (
-            <button type="button" className="search-clear-btn" onClick={() => { setInput(''); onClear(); }}>
+            <button type="button" className="search-clear-btn" onClick={handleClear}>
               <X size={14} />
             </button>
           )}
@@ -60,19 +56,16 @@ export default function CitySearch({ onSearch, onSelect, candidates, loading, er
       {candidates && candidates.length > 0 && (
         <div className="search-candidates">
           <p className="candidates-hint">지역을 선택하세요</p>
-          {candidates.map((c, i) => {
-            const { name, region, flag } = candidateLabel(c);
-            return (
-              <button key={i} className="candidate-item" onClick={() => handleSelect(c)}>
-                <span className="candidate-flag">{flag}</span>
-                <div className="candidate-info">
-                  <span className="candidate-name">{name}</span>
-                  {region && <span className="candidate-region">{region}</span>}
-                </div>
-                <Plus size={15} className="candidate-add-icon" />
-              </button>
-            );
-          })}
+          {candidates.map((c, i) => (
+            <button key={i} className="candidate-item" onClick={() => handleSelect(c)}>
+              <span className="candidate-flag">{c.flag}</span>
+              <div className="candidate-info">
+                <span className="candidate-name">{c.name}</span>
+                {c.region && <span className="candidate-region">{c.region}</span>}
+              </div>
+              <Plus size={15} className="candidate-add-icon" />
+            </button>
+          ))}
         </div>
       )}
     </div>
