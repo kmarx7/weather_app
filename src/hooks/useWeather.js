@@ -52,6 +52,24 @@ function toCandidate(r) {
   };
 }
 
+// 좌표 → 도시명 (역지오코딩)
+export async function reverseGeocode(lat, lon) {
+  const params = new URLSearchParams({
+    lat: String(lat), lon: String(lon),
+    format: 'json', 'accept-language': 'ko',
+  });
+  try {
+    const res = await fetch(`${NOMINATIM}/reverse?${params}`, { headers: NOMINATIM_HEADERS });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const addr = data.address ?? {};
+    const name = addr.city ?? addr.town ?? addr.village ?? addr.county ?? addr.suburb ?? null;
+    return name ? { name, lat, lon } : null;
+  } catch {
+    return null;
+  }
+}
+
 // 후보 목록 반환 (Nominatim — 한글 소도시 완전 지원)
 export async function searchCities(query) {
   // 공백이 있으면 마지막 토큰도 시도 ("경기 안산" → "안산")

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Search, Plus, AlertCircle, X } from 'lucide-react';
+import { Search, Plus, AlertCircle, X, LocateFixed } from 'lucide-react';
 
-export default function CitySearch({ onSearch, onSelect, candidates, loading, error, onClear }) {
+export default function CitySearch({ onSearch, onSelect, onLocate, candidates, loading, error, onClear }) {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e) => {
@@ -30,7 +30,7 @@ export default function CitySearch({ onSearch, onSelect, candidates, loading, er
             type="text"
             value={input}
             onChange={e => { setInput(e.target.value); if (candidates?.length) onClear(); }}
-            placeholder="도시 검색 (예: 안산, 경기 안산, 부천, Tokyo)"
+            placeholder="도시 검색 (예: 안산, 부천, Tokyo)"
             className="search-input"
             disabled={loading}
           />
@@ -43,6 +43,10 @@ export default function CitySearch({ onSearch, onSelect, candidates, loading, er
         <button type="submit" disabled={loading || !input.trim()} className="btn btn-primary">
           <Search size={16} />
           {loading ? '검색 중…' : '검색'}
+        </button>
+        <button type="button" disabled={loading} className="btn btn-secondary locate-btn" onClick={onLocate} title="현재 위치 날씨">
+          <LocateFixed size={16} />
+          <span className="locate-label">현재 위치</span>
         </button>
       </form>
 

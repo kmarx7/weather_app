@@ -209,8 +209,9 @@ body {
   .dg-weather  { grid-column: 1; align-self: stretch; display: flex; flex-direction: column; }
   .dg-air      { grid-column: 2; align-self: stretch; display: flex; flex-direction: column; }
   .dg-weather > *, .dg-air > * { flex: 1; }
-  .dg-summary  { grid-column: 1; }
-  .dg-tasks    { grid-column: 2; }
+  .dg-summary  { grid-column: 1; align-self: stretch; display: flex; flex-direction: column; }
+  .dg-tasks    { grid-column: 2; align-self: stretch; display: flex; flex-direction: column; }
+  .dg-summary > *, .dg-tasks > * { flex: 1; }
   .dg-weekly   { grid-column: 1; align-self: stretch; display: flex; flex-direction: column; }
   .dg-weekly > * { flex: 1; }
   .dg-outfit   { grid-column: 2; align-self: stretch; display: flex; flex-direction: column; }
@@ -269,6 +270,9 @@ body {
    CITY SEARCH
 ════════════════════════════════════════ */
 .city-search { display: flex; flex-direction: column; gap: 8px; }
+.city-search .locate-btn { flex-shrink: 0; }
+.locate-label { display: none; }
+@media (min-width: 480px) { .locate-label { display: inline; } }
 
 .search-input-wrap { position: relative; display: flex; align-items: center; flex: 1; }
 
@@ -441,6 +445,8 @@ body {
   border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  height: 100%;
+  box-sizing: border-box;
 }
 .section-title { display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 700; margin-bottom: 12px; }
 .empty-tasks { font-size: 14px; color: var(--text-muted); padding: 6px 0; }
@@ -593,7 +599,7 @@ body {
 /* ════════════════════════════════════════
    AI SUMMARY
 ════════════════════════════════════════ */
-.ai-summary { background: linear-gradient(135deg,#f5f3ff,#ede9fe); border: 1px solid #ddd6fe; border-radius: var(--radius); padding: 18px; }
+.ai-summary { background: linear-gradient(135deg,#f5f3ff,#ede9fe); border: 1px solid #ddd6fe; border-radius: var(--radius); padding: 18px; height: 100%; box-sizing: border-box; }
 .ai-summary.empty { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 14px; }
 .ai-summary-header { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #5b21b6; margin-bottom: 10px; }
 .ai-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #ddd6fe; color: #5b21b6; font-weight: 700; }

@@ -12,7 +12,7 @@ import WeatherComparison from './components/WeatherComparison';
 import WeeklyForecast from './components/WeeklyForecast';
 import OutfitRecommendation from './components/OutfitRecommendation';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { useWeather, searchCities } from './hooks/useWeather';
+import { useWeather, searchCities, reverseGeocode } from './hooks/useWeather';
 import { DEFAULT_RULES } from './utils/defaultRules';
 import { Cloud, LayoutDashboard, ListChecks, SlidersHorizontal, MapPin } from 'lucide-react';
 import './App.css';
@@ -117,6 +117,46 @@ export default function App() {
     setSelectedId(newLoc.id);
   };
 
+  const handleLocate = () => {
+    if (!navigator.geolocation) {
+      setAddError('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+      return;
+    }
+    if (locations.length >= MAX_LOCATIONS) {
+      setAddError(`최대 ${MAX_LOCATIONS}개 지역까지 추가할 수 있습니다.`);
+      return;
+    }
+    setAddError(null);
+    setCandidates(null);
+    setIsAdding(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        const geo = await reverseGeocode(coords.latitude, coords.longitude);
+        if (!geo) {
+          setAddError('현재 위치의 도시를 찾을 수 없습니다.');
+          setIsAdding(false);
+          return;
+        }
+        const exists = locations.find(l => l.cityName === geo.name);
+        if (exists) { setSelectedId(exists.id); setIsAdding(false); return; }
+
+        const result = await fetchWeather(geo.name);
+        setIsAdding(false);
+        if (!result) { setAddError('현재 위치 날씨를 불러올 수 없습니다.'); return; }
+
+        const newLoc = { id: Date.now(), cityName: geo.name, label: result.current?.name ?? geo.name };
+        setLocations(prev => [...prev, newLoc]);
+        setSelectedId(newLoc.id);
+      },
+      (err) => {
+        setAddError(err.code === 1 ? '위치 권한이 거부되었습니다. 브라우저 설정을 확인하세요.' : '위치를 가져올 수 없습니다.');
+        setIsAdding(false);
+      },
+      { timeout: 10000 }
+    );
+  };
+
   const handleRemoveLocation = (id) => {
     setLocations(prev => prev.filter(l => l.id !== id));
     if (selectedId === id) {
@@ -171,6 +211,7 @@ export default function App() {
               <CitySearch
                 onSearch={handleSearch}
                 onSelect={handleSelectCandidate}
+                onLocate={handleLocate}
                 candidates={candidates}
                 loading={isAdding}
                 error={addError}
