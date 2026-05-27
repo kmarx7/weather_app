@@ -202,11 +202,11 @@ export default function App() {
               <div className="dg-tasks">
                 <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
               </div>
-              <div className="dg-outfit">
-                <OutfitRecommendation weather={currentWeather} airQuality={airQuality} />
-              </div>
               <div className="dg-weekly">
                 <WeeklyForecast forecast={forecast} />
+              </div>
+              <div className="dg-outfit">
+                <OutfitRecommendation weather={currentWeather} airQuality={airQuality} />
               </div>
               <div className="dg-forecast">
                 <ForecastRecommendations forecast={forecast} rules={rules} />

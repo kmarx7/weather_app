@@ -211,8 +211,8 @@ body {
   .dg-weather > *, .dg-air > * { flex: 1; }
   .dg-summary  { grid-column: 1; }
   .dg-tasks    { grid-column: 2; }
-  .dg-outfit   { grid-column: 1; }
-  .dg-weekly   { grid-column: 2; }
+  .dg-weekly   { grid-column: 1; }
+  .dg-outfit   { grid-column: 2; }
   .dg-forecast { grid-column: 1 / -1; }
   .dg-compare  { grid-column: 1 / -1; }
 }
