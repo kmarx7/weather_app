@@ -9,6 +9,7 @@ import RuleManager from './components/RuleManager';
 import ProfileSettings from './components/ProfileSettings';
 import AiSummary from './components/AiSummary';
 import ActivityLog from './components/ActivityLog';
+import WeatherComparison from './components/WeatherComparison';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useWeather } from './hooks/useWeather';
 import { DEFAULT_RULES } from './utils/defaultRules';
@@ -136,17 +137,31 @@ export default function App() {
   const isLoading = weatherData?.loading ?? false;
   const error = weatherData?.error ?? null;
   const forecastRules = rules.filter(r => r.scope === 'forecast');
-
   const cityLabel = selectedLocation?.label ?? selectedLocation?.cityName ?? null;
 
   return (
     <div className="app">
-      {/* Header */}
+      {/* ── Header ── */}
       <header className="app-header">
         <div className="header-left">
           <Cloud size={20} className="header-icon" />
           <h1 className="app-title">Weather Tasks</h1>
         </div>
+
+        {/* Desktop tab nav (inside header) */}
+        <nav className="header-tabs">
+          {NAV_ITEMS.map(({ id, icon: Icon, label }) => (
+            <button
+              key={id}
+              className={`header-tab ${activeTab === id ? 'active' : ''}`}
+              onClick={() => setActiveTab(id)}
+            >
+              <Icon size={15} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+
         {cityLabel && (
           <div className="header-city">
             <MapPin size={13} />
@@ -155,73 +170,92 @@ export default function App() {
         )}
       </header>
 
-      {/* Scrollable content */}
+      {/* ── Main Content ── */}
       <main className="main-content">
+
         {activeTab === '대시보드' && (
           <div className="page-content">
-            <WeatherCard
-              weather={currentWeather}
-              loading={isLoading}
-              error={error}
-              cityName={cityLabel ?? '—'}
-              onRefresh={selectedLocation ? () => handleRefresh(selectedLocation.cityName) : null}
-            />
-            <AirQuality airQuality={airQuality} />
-            <AiSummary
-              cityName={cityLabel ?? ''}
-              weather={currentWeather}
-              forecast={forecast}
-              tasks={rules}
-              forecastTasks={forecastRules}
-              profile={profile}
-            />
-            <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
-            <ForecastRecommendations forecast={forecast} rules={rules} />
 
-            {/* Location section */}
-            <div className="location-section">
-              <div className="location-section-header">
+            {/* Location bar — always at top */}
+            <div className="location-bar">
+              <div className="location-bar-title">
                 <MapPin size={15} />
                 <span>지역 관리</span>
               </div>
-              <CitySearch onAdd={handleAddCity} loading={isLoading} />
-              <SavedLocations
-                locations={locations}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                onRemove={handleRemoveLocation}
-                onRefresh={handleRefresh}
-                weatherMap={weatherMap}
-              />
+              <div className="location-bar-body">
+                <CitySearch onAdd={handleAddCity} loading={isLoading} />
+                <SavedLocations
+                  locations={locations}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                  onRemove={handleRemoveLocation}
+                  onRefresh={handleRefresh}
+                  weatherMap={weatherMap}
+                />
+              </div>
+            </div>
+
+            {/* Dashboard grid */}
+            <div className="dashboard-grid">
+              <div className="dg-weather">
+                <WeatherCard
+                  weather={currentWeather}
+                  loading={isLoading}
+                  error={error}
+                  cityName={cityLabel ?? '—'}
+                  onRefresh={selectedLocation ? () => handleRefresh(selectedLocation.cityName) : null}
+                />
+              </div>
+              <div className="dg-air">
+                <AirQuality airQuality={airQuality} />
+              </div>
+              <div className="dg-summary">
+                <AiSummary
+                  cityName={cityLabel ?? ''}
+                  weather={currentWeather}
+                  forecast={forecast}
+                  tasks={rules}
+                  forecastTasks={forecastRules}
+                  profile={profile}
+                />
+              </div>
+              <div className="dg-tasks">
+                <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
+              </div>
+              <div className="dg-forecast">
+                <ForecastRecommendations forecast={forecast} rules={rules} />
+              </div>
+              <div className="dg-compare">
+                <WeatherComparison
+                  locations={locations}
+                  weatherMap={weatherMap}
+                  onRefresh={handleRefresh}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {activeTab === '규칙 관리' && (
-          <div className="page-content">
-            <RuleManager
-              rules={rules}
-              onAdd={handleAddRule}
-              onDelete={handleDeleteRule}
-              onToggle={handleToggleRule}
-            />
+          <div className="page-content page-single">
+            <RuleManager rules={rules} onAdd={handleAddRule} onDelete={handleDeleteRule} onToggle={handleToggleRule} />
           </div>
         )}
 
         {activeTab === '개인 설정' && (
-          <div className="page-content">
+          <div className="page-content page-single">
             <ProfileSettings profile={profile} onChange={setProfile} />
           </div>
         )}
 
         {activeTab === '실행 로그' && (
-          <div className="page-content">
+          <div className="page-content page-single">
             <ActivityLog logs={logs} onClear={() => setLogs([])} />
           </div>
         )}
       </main>
 
-      {/* Bottom Navigation */}
+      {/* ── Mobile Bottom Nav ── */}
       <nav className="bottom-nav">
         {NAV_ITEMS.map(({ id, icon: Icon, label }) => (
           <button
