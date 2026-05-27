@@ -9,6 +9,8 @@ import RuleManager from './components/RuleManager';
 import ProfileSettings from './components/ProfileSettings';
 import AiSummary from './components/AiSummary';
 import WeatherComparison from './components/WeatherComparison';
+import WeeklyForecast from './components/WeeklyForecast';
+import OutfitRecommendation from './components/OutfitRecommendation';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useWeather } from './hooks/useWeather';
 import { DEFAULT_RULES } from './utils/defaultRules';
@@ -28,7 +30,7 @@ const NAV_ITEMS = [
   { id: '설정', icon: SlidersHorizontal, label: '개인 맞춤 설정' },
 ];
 
-const MAX_LOCATIONS = 5;
+const MAX_LOCATIONS = 4;
 
 export default function App() {
   const [locations, setLocations] = useLocalStorage('wt_locations', []);
@@ -199,6 +201,12 @@ export default function App() {
               </div>
               <div className="dg-tasks">
                 <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
+              </div>
+              <div className="dg-outfit">
+                <OutfitRecommendation weather={currentWeather} airQuality={airQuality} />
+              </div>
+              <div className="dg-weekly">
+                <WeeklyForecast forecast={forecast} />
               </div>
               <div className="dg-forecast">
                 <ForecastRecommendations forecast={forecast} rules={rules} />

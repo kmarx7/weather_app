@@ -206,10 +206,13 @@ body {
   }
 
   /* Column assignments */
-  .dg-weather  { grid-column: 1; }
-  .dg-air      { grid-column: 2; }
+  .dg-weather  { grid-column: 1; align-self: stretch; display: flex; flex-direction: column; }
+  .dg-air      { grid-column: 2; align-self: stretch; display: flex; flex-direction: column; }
+  .dg-weather > *, .dg-air > * { flex: 1; }
   .dg-summary  { grid-column: 1; }
   .dg-tasks    { grid-column: 2; }
+  .dg-outfit   { grid-column: 1; }
+  .dg-weekly   { grid-column: 2; }
   .dg-forecast { grid-column: 1 / -1; }
   .dg-compare  { grid-column: 1 / -1; }
 }
@@ -626,14 +629,96 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ════════════════════════════════════════
-   ACTIVITY LOG
+   WEEKLY FORECAST
 ════════════════════════════════════════ */
-.activity-log { background: var(--bg-card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); }
-.log-list { display: flex; flex-direction: column; gap: 5px; list-style: none; max-height: 60vh; overflow-y: auto; }
-.log-item { display: flex; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; border-left: 3px solid; }
-.log-item.log-info    { border-color: var(--text-light); background: var(--bg-card2); }
-.log-item.log-success { border-color: var(--success); background: var(--success-bg); }
-.log-item.log-error   { border-color: var(--danger); background: var(--danger-bg); }
-.log-item.log-warn    { border-color: var(--warn); background: var(--warn-bg); }
-.log-time { font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
-.log-msg  { color: var(--text); }
+.weekly-forecast-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.weekly-list { display: flex; flex-direction: column; gap: 5px; }
+
+.weekly-item {
+  display: grid;
+  grid-template-columns: 68px 28px 1fr 44px 76px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card2);
+  border: 1px solid transparent;
+}
+
+.weekly-item.today {
+  background: var(--primary-bg);
+  border-color: #c7d2fe;
+}
+
+.weekly-day { display: flex; flex-direction: column; gap: 1px; }
+.weekly-dayname { font-size: 13px; font-weight: 700; color: var(--text); }
+.weekly-date { font-size: 11px; color: var(--text-muted); }
+.weekly-item.today .weekly-dayname { color: var(--primary); }
+
+.weekly-icon { font-size: 20px; text-align: center; }
+.weekly-cond { font-size: 12px; color: var(--text-muted); }
+.weekly-pop { font-size: 12px; color: #3b82f6; font-weight: 600; text-align: center; }
+
+.weekly-temps { display: flex; align-items: center; gap: 3px; justify-content: flex-end; }
+.weekly-high { font-size: 15px; font-weight: 700; color: var(--text); }
+.weekly-sep { font-size: 11px; color: var(--text-light); }
+.weekly-low { font-size: 13px; color: var(--text-muted); }
+
+/* ════════════════════════════════════════
+   OUTFIT RECOMMENDATION
+════════════════════════════════════════ */
+.outfit-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.outfit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.outfit-header .section-title { margin-bottom: 0; }
+
+.outfit-temp-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--bg-card2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.outfit-list { display: flex; flex-direction: column; gap: 7px; }
+
+.outfit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.outfit-emoji { font-size: 20px; flex-shrink: 0; line-height: 1; }
+.outfit-text { flex: 1; font-size: 14px; color: var(--text); }
+.outfit-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
