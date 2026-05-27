@@ -94,8 +94,19 @@ export default function WeeklyForecast({ forecast, airForecast }) {
               <span className="wfc-low">{day.low}°</span>
               {day.pop > 0 && <span className="wfc-pop">💧{day.pop}%</span>}
               {air && (
-                <span className="wfc-air" style={{ color: air.color }}>
-                  미세{air.label}
+                <span
+                  className="wfc-air"
+                  style={{
+                    background: air.color + '28',
+                    color: air.color,
+                    border: `1px solid ${air.color}55`,
+                  }}
+                >
+                  <span
+                    className="wfc-air-dot"
+                    style={{ background: air.color }}
+                  />
+                  {air.label}
                 </span>
               )}
             </div>
