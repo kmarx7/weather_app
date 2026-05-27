@@ -176,6 +176,7 @@ export default function App() {
   const currentWeather = weatherData?.current ?? null;
   const forecast = weatherData?.forecast ?? [];
   const airQuality = weatherData?.airQuality ?? null;
+  const airForecast = weatherData?.airForecast ?? [];
   const isLoading = weatherData?.loading ?? false;
   const error = weatherData?.error ?? null;
   const forecastRules = rules.filter(r => r.scope === 'forecast');
@@ -271,7 +272,7 @@ export default function App() {
                 <TaskRecommendations weather={currentWeather} rules={rules} profile={profile} />
               </div>
               <div className="dg-weekly">
-                <WeeklyForecast forecast={forecast} />
+                <WeeklyForecast forecast={forecast} airForecast={airForecast} />
               </div>
               <div className="dg-outfit">
                 <OutfitRecommendation weather={currentWeather} airQuality={airQuality} profile={profile} />

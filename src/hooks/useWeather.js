@@ -132,10 +132,11 @@ export function useWeather() {
       const { lat, lon } = coords;
       const coordParams = `lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=kr`;
 
-      const [currentRes, forecastRes, airRes] = await Promise.all([
+      const [currentRes, forecastRes, airRes, airForecastRes] = await Promise.all([
         fetch(`${BASE}/weather?${coordParams}`),
         fetch(`${BASE}/forecast?${coordParams}`),
         fetch(`${BASE}/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`),
+        fetch(`${BASE}/air_pollution/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`),
       ]);
 
       if (!currentRes.ok) {
@@ -146,6 +147,7 @@ export function useWeather() {
       const current = await currentRes.json();
       const forecast = forecastRes.ok ? await forecastRes.json() : null;
       const air = airRes.ok ? await airRes.json() : null;
+      const airForecast = airForecastRes.ok ? await airForecastRes.json() : null;
 
       setWeatherMap(prev => ({
         ...prev,
@@ -153,12 +155,13 @@ export function useWeather() {
           current,
           forecast: forecast?.list ?? [],
           airQuality: air?.list?.[0] ?? null,
+          airForecast: airForecast?.list ?? [],
           loading: false,
           error: null,
         },
       }));
 
-      return { current, forecast: forecast?.list ?? [], airQuality: air?.list?.[0] ?? null };
+      return { current, forecast: forecast?.list ?? [], airQuality: air?.list?.[0] ?? null, airForecast: airForecast?.list ?? [] };
     } catch (e) {
       setWeatherMap(prev => ({
         ...prev,

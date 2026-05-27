@@ -12,6 +12,14 @@ const CONDITION_KR = {
 
 const DAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
 
+// 한국 기준: 좋음 0-15, 보통 16-35, 나쁨 36-75, 매우나쁨 76+
+function pm25Level(pm25) {
+  if (pm25 <= 15) return { label: '좋음', color: '#22c55e' };
+  if (pm25 <= 35) return { label: '보통', color: '#facc15' };
+  if (pm25 <= 75) return { label: '나쁨', color: '#f97316' };
+  return { label: '매우나쁨', color: '#ef4444' };
+}
+
 function aggregateDaily(forecast) {
   const days = {};
   forecast.forEach(item => {
@@ -36,10 +44,30 @@ function aggregateDaily(forecast) {
   }).slice(0, 5);
 }
 
-export default function WeeklyForecast({ forecast }) {
+function aggregateDailyAir(airForecast) {
+  if (!airForecast || airForecast.length === 0) return {};
+  const days = {};
+  airForecast.forEach(item => {
+    const date = new Date(item.dt * 1000);
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    if (!days[key]) days[key] = [];
+    const pm25 = item.components?.pm2_5;
+    if (pm25 != null) days[key].push(pm25);
+  });
+  const result = {};
+  Object.entries(days).forEach(([key, vals]) => {
+    if (vals.length > 0) {
+      result[key] = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    }
+  });
+  return result;
+}
+
+export default function WeeklyForecast({ forecast, airForecast }) {
   if (!forecast || forecast.length === 0) return null;
 
   const days = aggregateDaily(forecast);
+  const airByDay = aggregateDailyAir(airForecast);
   const todayStr = new Date().toDateString();
 
   return (
@@ -52,6 +80,10 @@ export default function WeeklyForecast({ forecast }) {
           const dateStr = `${day.date.getMonth() + 1}/${day.date.getDate()}`;
           const icon = CONDITION_ICON[day.condition] ?? '🌡️';
           const cond = CONDITION_KR[day.condition] ?? day.condition;
+          const dayKey = `${day.date.getFullYear()}-${day.date.getMonth()}-${day.date.getDate()}`;
+          const pm25 = airByDay[dayKey];
+          const air = pm25 != null ? pm25Level(pm25) : null;
+
           return (
             <div key={i} className={`wf-card${isToday ? ' today' : ''}`}>
               <span className="wfc-dayname">{dayName}</span>
@@ -61,6 +93,11 @@ export default function WeeklyForecast({ forecast }) {
               <span className="wfc-high">{day.high}°</span>
               <span className="wfc-low">{day.low}°</span>
               {day.pop > 0 && <span className="wfc-pop">💧{day.pop}%</span>}
+              {air && (
+                <span className="wfc-air" style={{ color: air.color }}>
+                  미세{air.label}
+                </span>
+              )}
             </div>
           );
         })}

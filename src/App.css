@@ -1024,6 +1024,16 @@ body {
   font-weight: 600;
 }
 
+.wfc-air {
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 2px;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+  width: 100%;
+  text-align: center;
+}
+
 /* ════════════════════════════════════════
    OUTFIT RECOMMENDATION
 ════════════════════════════════════════ */
